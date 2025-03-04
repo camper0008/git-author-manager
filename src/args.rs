@@ -45,7 +45,7 @@ pub enum Commands {
         id: String,
 
         /// The command to run
-        cmd: String,
+        cmd: Vec<String>,
     },
 
     /// Adds an author based on `git config` (`user.name`, `user.email`)

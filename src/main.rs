@@ -136,22 +136,22 @@ fn remove(id: String, verbose: bool) -> Result<(), String> {
     Ok(())
 }
 
-fn execute_cmd(input: String) {
-    let cmd = if cfg!(target_os = "windows") {
-        std::process::Command::new("cmd")
-            .args(["/C", &input])
-            .spawn()
-    } else {
-        std::process::Command::new("sh")
-            .args(["-c", &input])
-            .spawn()
-    };
-    match cmd {
+fn execute_cmd(input: Vec<String>) {
+    if input.is_empty() {
+        eprintln!("empty command");
+        return;
+    }
+    let mut iter = input.into_iter();
+    let cmd = iter.next().expect("input not empty");
+    let args: Vec<_> = iter.collect();
+    let output = std::process::Command::new(&cmd).args(&args).spawn();
+    let args = args.join(" ");
+    match output {
         Ok(mut child) => match child.wait() {
-            Ok(code) => eprintln!("cmd '{input}' returned {code}"),
-            Err(e) => eprintln!("an error occurred waiting for cmd '{input}' to exit: {e}"),
+            Ok(code) => eprintln!("cmd '{cmd} {args}' returned {code}"),
+            Err(e) => eprintln!("an error occurred waiting for cmd '{cmd} {args}' to exit: {e}"),
         },
-        Err(e) => eprintln!("unable to run cmd '{input}': {e}"),
+        Err(e) => eprintln!("unable to run cmd '{cmd} {args}': {e}"),
     }
 }
 
@@ -159,7 +159,7 @@ fn doas(
     old_author: &Author,
     git_config: &mut GitConfig,
     id: String,
-    cmd: String,
+    cmd: Vec<String>,
     verbose: bool,
 ) -> Result<(), String> {
     let config_path = Config::path()?;
