@@ -4,11 +4,13 @@ tool to make managing author identities easier.
 
 ## usecases
 
-this is useful to you, if you, among other use cases:
+this is useful to you, if you, for example:
 
-- are peer programming with a partner on the same machine, and want accurately attribute commits (`git aum doas <id> git commit (...)`
-- have seperate author configurations for your personal and workplace account(s) and want to quickly configure a repo as either being a personal repo or a work related repo: with a `.git-authors.toml` in your `$HOME` directory, `git aum set personal` or `git aum set some-company-name`
-- or you just want an easy way to manage your git config author
+- are peer programming on a shared machine, and want accurately attribute commits
+  - `git aum doas <id> git commit (...)`
+- have seperate author configurations for your personal and workplace account(s) and want to quickly configure a repo as either being a personal repo or a work related repo
+  - with a `.git-authors.toml` in your `$HOME` directory, `git aum set <personal>` or `git aum set <some-company-name>`
+- just want a simpler way to manage your `git config user.name` and `git config user.email`
 
 ## installation
 
