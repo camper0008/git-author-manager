@@ -3,14 +3,11 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command()]
 pub struct Args {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
+    #[clap(short, long)]
+    pub verbose: bool,
 
-impl Args {
-    pub fn command(&self) -> &Commands {
-        self.command.as_ref().unwrap_or(&Commands::Get)
-    }
+    #[command(subcommand)]
+    pub command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -20,31 +17,40 @@ pub enum Commands {
 
     /// Set current author
     Set {
-        /// The identifier the author is saved as, i.e. `tph`
-        identifier: String,
+        /// The id the author is saved as, i.e. `tph`
+        id: String,
     },
 
     /// Adds an author
     Add {
-        /// The identifier to save the author as, i.e. `tph`
-        identifier: String,
+        /// The id to save the author as, i.e. `tph`
+        id: String,
         /// The name of the author, i.e. `Theis Pieter Hollebeek`
-        name: Option<String>,
+        name: String,
         /// The email of the author, i.e. `tphollebeek@example.org`
-        email: Option<String>,
+        email: String,
     },
 
     /// Removes an author (alias: `rm`)
     #[clap(alias = "rm")]
     Remove {
-        /// The identifier the author is saved as, i.e. `tph`
-        identifier: String,
+        /// The id the author is saved as, i.e. `tph`
+        id: String,
+    },
+
+    /// Runs the code as the author specified, then reverts to previous config
+    Doas {
+        /// The id of the author to run the cmd as, i.e. `tph`
+        id: String,
+
+        /// The command to run
+        cmd: String,
     },
 
     /// Adds an author based on `git config` (`user.name`, `user.email`)
     AddFromGit {
-        /// The identifier to save the author as, i.e. `tph`
-        identifier: String,
+        /// The id to save the author as, i.e. `tph`
+        id: String,
     },
 }
 
