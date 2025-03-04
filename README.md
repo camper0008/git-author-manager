@@ -12,14 +12,15 @@ when installed, it ships a binary called `git-aum`, (git **au**thor **m**anager)
 
 you can:
 - `git aum get` to get the current config and authors available in the found config files
-- `git aum set <id>` to set yourself as an added author
+- `git aum set <id>` to set the git author to available author
 - `git aum add <id> <name> email>` to add an author to the config
 - `git aum remove <id>` to remove an author from the config
 - `git aum doas <id> <cmd>` to run a cmd as an author, and then change back to your previous config
 - `git aum add-from-git <id>` to add an author based on your current git config
-- `git aum copy-config [dest]` to copy the nearest config to `dest`, or the current working directory. if `dest` is a directory, it will write to `<dest>/.git-authors.toml`. if you for example have a `$HOME/.git-authors.toml`, you can use this to easily copy the config into your workspace.
+- `git aum copy-config [dest]` to copy the nearest config to `dest`, or the current working directory. if `dest` is a directory, it will write to `<dest>/.git-authors.toml`. if you have, for example, a `$HOME/.git-authors.toml`, you can use this to easily copy the config into your workspace.
 
-additionally, there is a `-v, --verbose` flag for all of the commands which prints information such as which config file is being read from
+there is a `-v, --verbose` flag for all of the commands which prints information such as which config file is being read from
+there is also a `git aum help` command aswell as a `-h, --help` flag.
 
 ### example
 
