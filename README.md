@@ -24,9 +24,9 @@ there is a `-v, --verbose` flag for all of the commands which prints information
 ### example
 
 if you have a user called `tph`, and a user called `mtk` you can:
-set the author to tph: `git aum set tph`
-commit as mtk: `git aum doas mtk 'git commit -m "refactored board state"'`
-and verify that you are still tph: `git aum get`
+- set the author to tph: `git aum set tph`
+- commit as mtk: `git aum doas mtk 'git commit -m "refactored board state"'`
+- and verify that you are still tph: `git aum get`
 
 ## poisoning global state
 
