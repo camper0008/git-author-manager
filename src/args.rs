@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -31,8 +33,7 @@ pub enum Commands {
         email: String,
     },
 
-    /// Removes an author (alias: `rm`)
-    #[clap(alias = "rm")]
+    /// Removes an author
     Remove {
         /// The id the author is saved as, i.e. `tph`
         id: String,
@@ -51,6 +52,12 @@ pub enum Commands {
     AddFromGit {
         /// The id to save the author as, i.e. `tph`
         id: String,
+    },
+
+    /// Copies the first found config file to the specified path
+    CopyConfig {
+        /// The path to copy the config file to. Defaults to current working directory
+        destination: Option<PathBuf>,
     },
 }
 

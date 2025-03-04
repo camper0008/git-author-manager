@@ -204,6 +204,34 @@ fn doas(
     Ok(())
 }
 
+fn copy_config(mut destination: std::path::PathBuf, verbose: bool) -> Result<(), String> {
+    let config_path = Config::path()?;
+
+    if destination.is_dir() {
+        destination.push(config::CONFIG_FILE_NAME);
+    }
+
+    if verbose {
+        eprintln!("copying from config file '{}'", config_path.display());
+        eprintln!("copying to config file '{}'", destination.display());
+    }
+
+    let Some(config) = Config::from_file(&config_path)? else {
+        return Err(format!(
+            "no config file found at '{}'",
+            config_path.display()
+        ));
+    };
+
+    config.write(&destination)?;
+
+    if verbose {
+        eprintln!("wrote to config file '{}'", destination.display());
+    }
+
+    Ok(())
+}
+
 fn main() -> Result<(), String> {
     let mut repo_config = GitConfig::new()?;
 
@@ -222,5 +250,11 @@ fn main() -> Result<(), String> {
         args::Commands::Doas { id, cmd } => {
             doas(&current_author, &mut repo_config, id, cmd, verbose)
         }
+        args::Commands::CopyConfig { destination } => copy_config(
+            destination.map(Ok).unwrap_or_else(|| {
+                std::env::current_dir().map_err(|e| format!("error: unable to get cwd: {e}"))
+            })?,
+            verbose,
+        ),
     }
 }
