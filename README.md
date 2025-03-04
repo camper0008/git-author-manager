@@ -19,8 +19,7 @@ you can:
 - `git aum add-from-git <id>` to add an author based on your current git config
 - `git aum copy-config [dest]` to copy the nearest config to `dest`, or the current working directory. if `dest` is a directory, it will write to `<dest>/.git-authors.toml`. if you have, for example, a `$HOME/.git-authors.toml`, you can use this to easily copy the config into your workspace.
 
-there is a `-v, --verbose` flag for all of the commands which prints information such as which config file is being read from
-there is also a `git aum help` command aswell as a `-h, --help` flag.
+there is a `-v, --verbose` flag for all of the commands which prints information such as which config file is being read from, aswell as a `git aum help` command, and a `-h, --help` flag.
 
 ### example
 
