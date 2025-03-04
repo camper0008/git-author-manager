@@ -9,7 +9,7 @@ pub struct Args {
     pub verbose: bool,
 
     #[command(subcommand)]
-    pub command: Option<Commands>,
+    pub command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -44,7 +44,7 @@ pub enum Commands {
         /// The id of the author to run the cmd as, i.e. `tph`
         id: String,
 
-        /// The command to run
+        /// The command to run, i.e. `git commit -m "v0.1.0"`
         cmd: Vec<String>,
     },
 

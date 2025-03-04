@@ -17,13 +17,9 @@ fn eprint_author(author: &Author) {
     println!("     mail: '{}'", author.email);
 }
 
-fn current_author(config: &GitConfig) -> Result<Author, String> {
-    let name = config.get(&GitConfigKey::Name)?;
-    let email = config.get(&GitConfigKey::Email)?;
-    Ok(Author { name, email })
-}
+fn get(verbose: bool) -> Result<(), String> {
+    let author = GitConfig::new()?.author()?;
 
-fn get(author: Author, verbose: bool) -> Result<(), String> {
     let config_path = Config::path()?;
     let Some(config) = Config::from_file(&config_path)? else {
         if verbose {
@@ -49,7 +45,8 @@ fn get(author: Author, verbose: bool) -> Result<(), String> {
     Ok(())
 }
 
-fn set(id: String, git_config: &mut GitConfig, verbose: bool) -> Result<(), String> {
+fn set(id: String, verbose: bool) -> Result<(), String> {
+    let mut git_config = GitConfig::new()?;
     let config_path = Config::path()?;
     let Some(config) = Config::from_file(&config_path)? else {
         return Err(format!(
@@ -155,13 +152,9 @@ fn execute_cmd(input: Vec<String>) {
     }
 }
 
-fn doas(
-    old_author: &Author,
-    git_config: &mut GitConfig,
-    id: String,
-    cmd: Vec<String>,
-    verbose: bool,
-) -> Result<(), String> {
+fn doas(id: String, cmd: Vec<String>, verbose: bool) -> Result<(), String> {
+    let mut git_config = GitConfig::new()?;
+    let old_author = git_config.author()?;
     let config_path = Config::path()?;
 
     if verbose {
@@ -233,23 +226,17 @@ fn copy_config(mut destination: std::path::PathBuf, verbose: bool) -> Result<(),
 }
 
 fn main() -> Result<(), String> {
-    let mut repo_config = GitConfig::new()?;
-
-    let current_author = current_author(&repo_config)?;
-
     let args = args();
 
     let verbose = args.verbose;
 
-    match args.command.unwrap_or(args::Commands::Get) {
-        args::Commands::Get => get(current_author, verbose),
-        args::Commands::Set { id } => set(id.to_string(), &mut repo_config, verbose),
+    match args.command {
+        args::Commands::Get => get(verbose),
+        args::Commands::Set { id } => set(id.to_string(), verbose),
         args::Commands::Add { id, name, email } => add(id, Author { name, email }, verbose),
-        args::Commands::AddFromGit { id } => add(id, current_author, verbose),
+        args::Commands::AddFromGit { id } => add(id, GitConfig::new()?.author()?, verbose),
         args::Commands::Remove { id } => remove(id, verbose),
-        args::Commands::Doas { id, cmd } => {
-            doas(&current_author, &mut repo_config, id, cmd, verbose)
-        }
+        args::Commands::Doas { id, cmd } => doas(id, cmd, verbose),
         args::Commands::CopyConfig { destination } => copy_config(
             destination.map(Ok).unwrap_or_else(|| {
                 std::env::current_dir().map_err(|e| format!("error: unable to get cwd: {e}"))

@@ -1,5 +1,7 @@
 use git2::{Config, Repository};
 
+use crate::author::Author;
+
 pub struct GitConfig {
     global: Config,
     local: Config,
@@ -53,6 +55,12 @@ impl GitConfig {
 
     pub fn set(&mut self, key: &GitConfigKey, value: &str) -> Result<(), String> {
         self.set_local_config(Self::key_to_git_config_key(key), value)
+    }
+
+    pub fn author(&self) -> Result<Author, String> {
+        let name = self.get(&GitConfigKey::Name)?;
+        let email = self.get(&GitConfigKey::Email)?;
+        Ok(Author { name, email })
     }
 }
 
