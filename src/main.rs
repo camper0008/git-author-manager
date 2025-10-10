@@ -92,6 +92,13 @@ fn add(id: String, Author { name, email }: Author, verbose: bool) -> Result<(), 
         let mut config = Config::new();
         config.authors.insert(id, Author { name, email });
         config.write(&config_path)?;
+
+        println!("available authors:");
+        for (id, author) in config.authors.into_iter() {
+            println!("  {id}:");
+            print_author(&author);
+        }
+
         return Ok(());
     };
 
