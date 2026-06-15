@@ -50,16 +50,16 @@ pub enum Commands {
 
     /// Commits the code as the author specified, then reverts to previous config
     Commit {
-        /// The id of the author to commit as, i.e. `tph`
-        id: String,
+        /// The id of the author to commit as, i.e. `tph`. Defaults to current user
+        #[arg(short, long)]
+        author: Option<String>,
 
-        /// Co-authors, i.e. `git aum commit -c tph -c mtk -m "v0.1.0"`
+        /// Id of co-authors, i.e. `git aum commit -c mtk -c tph -- -m "v0.1.0"`
         #[arg(short, long)]
         co_authors: Vec<String>,
 
-        /// Message, i.e. `git aum commit tph -m "hello"`
-        #[arg(short, long)]
-        message: String,
+        /// Additional flags, i.e. `git aum commit tph -- -am "hello"`
+        flags: Vec<String>,
     },
 
     /// Adds an author based on `git config` (`user.name`, `user.email`)
