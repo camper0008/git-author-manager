@@ -159,6 +159,94 @@ fn execute_cmd(input: Vec<String>) {
     }
 }
 
+fn commit_as(
+    id: String,
+    co_authors: Vec<String>,
+    message: String,
+    verbose: bool,
+) -> Result<(), String> {
+    let mut git_config = GitConfig::new()?;
+    let old_author = git_config.author()?;
+    let config_path = Config::path()?;
+
+    if verbose {
+        eprintln!("reading from config file '{}'", config_path.display());
+    }
+
+    let Some(config) = Config::from_file(&config_path)? else {
+        return Err(format!(
+            "no config file found at '{}'",
+            config_path.display()
+        ));
+    };
+
+    let Some(author) = config.authors.get(&id) else {
+        return Err(format!(
+            "config file '{}' does not contain any authors identified by '{id}'",
+            config_path.display()
+        ));
+    };
+
+    let co_authors = co_authors
+        .iter()
+        .map(|id| {
+            let Some(author) = config.authors.get(id) else {
+                return Err(format!(
+                    "config file '{}' does not contain any authors identified by '{id}'",
+                    config_path.display()
+                ));
+            };
+            Ok(author)
+        })
+        .collect::<Result<Vec<&Author>, String>>()?;
+
+    git_config.set(&GitConfigKey::Name, &author.name)?;
+    git_config.set(&GitConfigKey::Email, &author.email)?;
+
+    if verbose {
+        eprintln!("current author:");
+        eprint_author(&author);
+        eprintln!("executing cmd");
+    }
+
+    {
+        let mut message = message;
+        if co_authors.len() > 0 {
+            message.push_str("\n\n");
+            for author in co_authors {
+                message.push_str("Co-authored-by: ");
+                message.push_str(&author.name);
+                message.push_str(" <");
+                message.push_str(&author.email);
+                message.push_str(">\n");
+            }
+            if verbose {
+                eprintln!("final commit message:");
+                eprintln!("{message}");
+            }
+        }
+        let cmd = Vec::from([
+            "git".to_string(),
+            "commit".to_string(),
+            "-m".to_string(),
+            message,
+        ]);
+        dbg!(cmd);
+        // execute_cmd(cmd);
+    }
+
+    git_config.set(&GitConfigKey::Name, &old_author.name)?;
+    git_config.set(&GitConfigKey::Email, &old_author.email)?;
+
+    if verbose {
+        eprintln!("cmd executed");
+        eprintln!("current author:");
+        eprint_author(&author);
+    }
+
+    Ok(())
+}
+
 fn doas(id: String, cmd: Vec<String>, verbose: bool) -> Result<(), String> {
     let mut git_config = GitConfig::new()?;
     let old_author = git_config.author()?;
@@ -244,6 +332,11 @@ fn main() -> Result<(), String> {
         args::Commands::AddFromGit { id } => add(id, GitConfig::new()?.author()?, verbose),
         args::Commands::Remove { id } => remove(id, verbose),
         args::Commands::Doas { id, cmd } => doas(id, cmd, verbose),
+        args::Commands::Commit {
+            id,
+            co_authors,
+            message,
+        } => commit_as(id, co_authors, message, verbose),
         args::Commands::CopyConfig { destination } => copy_config(
             destination.map(Ok).unwrap_or_else(|| {
                 std::env::current_dir().map_err(|e| format!("error: unable to get cwd: {e}"))

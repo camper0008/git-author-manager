@@ -39,13 +39,27 @@ pub enum Commands {
         id: String,
     },
 
-    /// Runs the code as the author specified, then reverts to previous config
+    /// Runs the cmd as the author specified, then reverts to previous config
     Doas {
         /// The id of the author to run the cmd as, i.e. `tph`
         id: String,
 
         /// The command to run, i.e. `git commit -m "v0.1.0"`
         cmd: Vec<String>,
+    },
+
+    /// Commits the code as the author specified, then reverts to previous config
+    Commit {
+        /// The id of the author to commit as, i.e. `tph`
+        id: String,
+
+        /// Co-authors, i.e. `git aum commit -c tph -c mtk -m "v0.1.0"`
+        #[arg(short, long)]
+        co_authors: Vec<String>,
+
+        /// Message, i.e. `git aum commit tph -m "hello"`
+        #[arg(short, long)]
+        message: String,
     },
 
     /// Adds an author based on `git config` (`user.name`, `user.email`)
